@@ -112,24 +112,32 @@ const connectHub = (connectEndpoint, userId) => {
   })
   .build();
 
-  connection.on("newMessage", data => {
-    console.log('newMessage payload', data)
+  connection.on("group:newMessage", data => {
+    console.log('group:newMessage payload', data)
     store.dispatch({type: 'NEW_MESSAGE', message: data})
   });
 
-  connection.on("memberJoined", data => {
-    console.log('memberJoined payload', data)
+  connection.on("group:memberJoined", data => {
+    console.log('group:memberJoined payload', data)
     if (data.newMember === userId) {
       store.dispatch({type: 'GROUP_JOINED', groupName: data.groupName})
     }
   });
 
-  connection.on("memberLeft", data => {
-    console.log('memberLeft payload', data)
+  connection.on("group:memberLeft", data => {
+    console.log('group:memberLeft payload', data)
   });
 
-  connection.on("memberLeftBroadcast", data => {
-    console.log('memberLeftBroadcast payload', data)
+  connection.on("global:newMessage", data => {
+    console.log('global:newMessage payload', data)
+  });
+
+  connection.on("user:newMessage", data => {
+    console.log('user:newMessage payload', data)
+  });
+
+  connection.on("global:memberLeft", data => {
+    console.log('global:memberLeft payload', data)
   });
 
   connection
