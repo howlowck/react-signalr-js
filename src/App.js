@@ -70,7 +70,7 @@ const renderGroupMessages = (groupJoined, members, userId, messages) => {
         <div id="messages">
           {messages.map((_, index) => {
             return (
-              <div key={index}>{_.message} <span style={{fontSize: 13}}> ({userId === _.userId ? `from ME`: `from ${_.userId}`} [{moment(_.utcTimestamp).fromNow()}])</span></div>
+              <div key={index}>{_.message} <span style={{fontSize: 13}}> ({userId === _.userId ? `from ME`: `from ${_.userId}`} [{moment(_.utcTimestamp).format('LTS')}])</span></div>
             )
           })}
         </div>
