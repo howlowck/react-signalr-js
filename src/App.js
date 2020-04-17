@@ -14,6 +14,7 @@ function App(props) {
   const groupNameValue = useSelector(state => state.groupNameValue)
   // const connectionId = useSelector(state => state.connectionId)
   const groupJoined = useSelector(state => state.joined)
+  const members = useSelector(state => state.members)
 
   const dispatch = useDispatch()
   const onSendFunc = props.onSendClick
@@ -40,11 +41,29 @@ function App(props) {
       {groupJoined? `Send Message To ${groupJoined}:`:`Send:`}
       <form onSubmit={evt => evt.preventDefault()}>
         <input value={messageValue} onChange={(evt) => dispatch({ type: 'SET_MESSAGE', value: evt.target.value })} /> 
-        <button onClick={() => { onSendFunc(sendEndpoint, messageValue, groupNameValue); dispatch({ type: 'SET_MESSAGE', value: '' }) }} disabled={!groupJoined}>Send</button>
+        <button onClick={() => { onSendFunc(sendEndpoint, groupNameValue, messageValue); dispatch({ type: 'SET_MESSAGE', value: '' }) }} disabled={!groupJoined}>Send</button>
       </form>
       <br /><br />
-      <div className="groupMessages">
-        {groupJoined ? <h3>Messages from "{groupJoined}" Group</h3> : ''}
+      {renderGroupMessages(groupJoined, members, userId, messages)}
+    </div>
+  );
+}
+
+const renderGroupMessages = (groupJoined, members, userId, messages) => {
+  if (groupJoined){
+    return <div className="groupMessages">
+        <h3>Messages from "{groupJoined}" Group</h3>
+        <h4>Members</h4>
+        <div className="members">
+          {members.map(_ => {
+            if (_ === userId) {
+              return <span key={_} style={{background: 'blue', color: 'white', padding: 5}}>You</span>
+            } else {
+              return <span key={_} style={{padding: 5, border: '1px gray solid'}}>{_}</span>
+            }
+          })}
+        </div>
+        <h4>Messages</h4>
         <div id="messages">
           {messages.map((_, index) => {
             return (
@@ -53,8 +72,8 @@ function App(props) {
           })}
         </div>
       </div>
-    </div>
-  );
+  }
+  return ''
 }
 
 export default App;

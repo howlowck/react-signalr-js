@@ -122,10 +122,12 @@ const connectHub = (connectEndpoint, userId) => {
     if (data.newMember === userId) {
       store.dispatch({type: 'GROUP_JOINED', groupName: data.groupName})
     }
+    store.dispatch({type: 'SET_MEMBERS', groupName: data.groupName, members: data.members})
   });
 
   connection.on("group:memberLeft", data => {
     console.log('group:memberLeft payload', data)
+    store.dispatch({type: 'SET_MEMBERS', groupName: data.groupName, members: data.members})
   });
 
   connection.on("global:newMessage", data => {
@@ -153,7 +155,7 @@ const connectHub = (connectEndpoint, userId) => {
 }
 
 
-const sendMessage = (sendEndpoint, message, group) => {
+const sendMessage = (sendEndpoint, group, message) => {
   return fetch(`${sendEndpoint}&userId=${userId}`, {
     method: 'POST',
     headers: {
