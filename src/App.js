@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux'
+import moment from 'moment'
 import './App.css';
 
 
@@ -69,7 +70,7 @@ const renderGroupMessages = (groupJoined, members, userId, messages) => {
         <div id="messages">
           {messages.map((_, index) => {
             return (
-              <div key={index}>{_.message} <span style={{fontSize: 13}}> ({userId === _.userId ? `from ME`: `from ${_.userId}`})</span></div>
+              <div key={index}>{_.message} <span style={{fontSize: 13}}> ({userId === _.userId ? `from ME`: `from ${_.userId}`} [{moment(_.utcTimestamp).fromNow()}])</span></div>
             )
           })}
         </div>
