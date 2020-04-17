@@ -7,6 +7,7 @@ function App(props) {
   const connectEndpoint = useSelector(state => state.connectEndpoint)
   const joinEndpoint = useSelector(state => state.joinEndpoint)
   const sendEndpoint = useSelector(state => state.sendEndpoint)
+  const messagesEndpoint = useSelector(state => state.messagesEndpoint)
   const userId = useSelector(state => state.userId)
   const messages = useSelector(state => state.messages)
   const connected = useSelector(state => state.connected)
@@ -28,14 +29,15 @@ function App(props) {
       <form onSubmit={evt => evt.preventDefault()}>
         <input placeholder="Connect Endpoint ie. {fnx-url}/api{?code=key} (don't include /negotiate)" value={connectEndpoint} onChange={(evt) => dispatch({ type: 'SET_CONNECT_ENDPOINT', endpoint: evt.target.value })} style={{width: 400}} disabled={connected} /><br/>
         <input placeholder="Join Endpoint ie. {fnx-url}/api/addToGroup{?code=key}" value={joinEndpoint} onChange={(evt) => dispatch({ type: 'SET_JOIN_ENDPOINT', endpoint: evt.target.value })} style={{width: 400}} disabled={connected}/><br />
-        <input placeholder="Send Endpoint ie. {fnx-url}/api/messages{?code=key}" value={sendEndpoint} onChange={(evt) => dispatch({ type: 'SET_SEND_ENDPOINT', endpoint: evt.target.value })} style={{width: 400}} disabled={connected}/>
+        <input placeholder="Send Endpoint ie. {fnx-url}/api/messages{?code=key}" value={sendEndpoint} onChange={(evt) => dispatch({ type: 'SET_SEND_ENDPOINT', endpoint: evt.target.value })} style={{width: 400}} disabled={connected}/><br />
+        <input placeholder="Messages Endpoint ie. {fnx-url}/getMessages{?code=key}" value={messagesEndpoint} onChange={(evt) => dispatch({ type: 'SET_MESSAGES_ENDPOINT', endpoint: evt.target.value })} style={{width: 400}} disabled={connected} /><br/>
         <button onClick={() => { onConnectFunc(connectEndpoint, userId) }} disabled={!(connectEndpoint && joinEndpoint && sendEndpoint) || connected}>{connected ? 'Connected' : 'Connect'}</button>
       </form>
       <br />
       Join Group: 
       <form onSubmit={evt => evt.preventDefault()}>
         <input value={groupNameValue} onChange={(evt) => dispatch({ type: 'SET_GROUP_VALUE', value: evt.target.value })} disabled={groupJoined} />
-        <button onClick={() => { onJoinFunc(joinEndpoint, groupNameValue, userId) }} disabled={!connected || groupJoined}>Join</button>
+        <button onClick={() => { onJoinFunc(joinEndpoint, messagesEndpoint, groupNameValue, userId) }} disabled={!connected || groupJoined}>Join</button>
       </form>
       <br />
       {groupJoined? `Send Message To ${groupJoined}:`:`Send:`}
@@ -52,7 +54,7 @@ function App(props) {
 const renderGroupMessages = (groupJoined, members, userId, messages) => {
   if (groupJoined){
     return <div className="groupMessages">
-        <h3>Messages from "{groupJoined}" Group</h3>
+        <h3>"{groupJoined}" Group</h3>
         <h4>Members</h4>
         <div className="members">
           {members.map(_ => {

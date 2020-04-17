@@ -12,6 +12,7 @@ const defaultState = {
   connectEndpoint: localStorage.getItem('react-signalr/connectEndpoint') || '',
   joinEndpoint: localStorage.getItem('react-signalr/joinEndpoint') || '',
   sendEndpoint: localStorage.getItem('react-signalr/sendEndpoint') || '',
+  messagesEndpoint: localStorage.getItem('react-signalr/messagesEndpoint') || '',
   userId: '',
   groupNameValue: '', 
   messageValue: '', 
@@ -47,6 +48,14 @@ const store = createStore((prev = defaultState, action ) => {
     return {
       ...prev,
       sendEndpoint: action.endpoint
+    } 
+  }
+
+  if (action.type === 'SET_MESSAGES_ENDPOINT') {
+    localStorage.setItem('react-signalr/messagesEndpoint', action.endpoint)
+    return {
+      ...prev,
+      messagesEndpoint: action.endpoint
     } 
   }
 
@@ -100,6 +109,13 @@ const store = createStore((prev = defaultState, action ) => {
     }
   }
 
+  if (action.type === 'SET_MESSAGES') {
+    return {
+      ...prev,
+      messages: action.messages
+    }
+  }
+
   return prev
 })
 
@@ -107,7 +123,7 @@ store.dispatch({type: 'SET_USER_ID', value: userId})
 
 const connectHub = (connectEndpoint, userId) => {
   let connection = new signalR.HubConnectionBuilder()
-  .withUrl(`${connectEndpoint}&userId=${userId}`, {
+  .withUrl(`${connectEndpoint}${connectEndpoint.indexOf('?') < 0 ? '?' : '&'}userId=${userId}`, {
     transport: signalR.HttpTransportType.WebSockets
   })
   .build();
@@ -156,7 +172,7 @@ const connectHub = (connectEndpoint, userId) => {
 
 
 const sendMessage = (sendEndpoint, group, message) => {
-  return fetch(`${sendEndpoint}&userId=${userId}`, {
+  return fetch(`${sendEndpoint}${sendEndpoint.indexOf('?') < 0 ? '?' : '&'}userId=${userId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -169,9 +185,9 @@ const sendMessage = (sendEndpoint, group, message) => {
   })
 }
 
-const joinGroup = (joinEndpoint, name, userId) => {
+const joinGroup = (joinEndpoint, messagesEndpoint, name, userId) => {
   console.log('joining group...')
-  return fetch(`${joinEndpoint}&groupName=${name}&userId=${userId}`, {
+  return fetch(`${joinEndpoint}${joinEndpoint.indexOf('?') < 0 ? '?' : '&'}groupName=${name}&userId=${userId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -182,11 +198,16 @@ const joinGroup = (joinEndpoint, name, userId) => {
     })
   })
   .catch((err) => {console.log(err)})
-  .then(() => {
-    
+  .then(() => fetchMessages(messagesEndpoint, name))
+  .then(messages => {
+    store.dispatch({type: 'SET_MESSAGES', messages})
   })
 }
 
+const fetchMessages = (messagesEndpoint, groupName) => {
+  return fetch(`${messagesEndpoint}${messagesEndpoint.indexOf('?') < 0 ? '?' : '&'}groupName=${groupName}`)
+    .then(res => res.json())
+}
 
 
 ReactDOM.render(
